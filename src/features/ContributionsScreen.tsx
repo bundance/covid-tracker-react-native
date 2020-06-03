@@ -11,7 +11,7 @@ import { getDaysAgo } from '@covid/utils/datetime';
 import { DrawerNavigationProp } from '@react-navigation/drawer';
 import { RouteProp } from '@react-navigation/native';
 import { colors } from '@theme';
-import { Accordion, Card } from 'native-base';
+import { Accordion, Card, Icon, Text } from 'native-base';
 import React, { Component } from 'react';
 import { Image, SafeAreaView, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import key from 'weak-key';
@@ -51,9 +51,21 @@ const initialState = {
 
 // blobby
 const dataArray = [
-  { title: 'First Element', content: 'Lorem ipsum dolor sit amet' },
-  { title: 'Second Element', content: 'Lorem ipsum dolor sit amet' },
-  { title: 'Third Element', content: 'Lorem ipsum dolor sit amet' },
+  {
+    id: '00000000-0000-0000-0000-000000000000',
+    avatar_name: 'profile1',
+    name: 'Me',
+  },
+  {
+    id: '00000000-0000-0000-0000-000000000001',
+    avatar_name: 'profile2',
+    name: 'Joe',
+  },
+  {
+    id: '00000000-0000-0000-0000-000000000002',
+    avatar_name: 'profile3',
+    name: 'Anna',
+  },
 ];
 
 export class ContributionsScreen extends Component<RenderProps, State> {
@@ -124,8 +136,77 @@ export class ContributionsScreen extends Component<RenderProps, State> {
     }
   }
 
-  gotoCreateProfile() {
-    this.props.navigation.navigate('CreateProfile', { avatarName: this.getNextAvatarName() });
+  _renderHeader(item, expanded) {
+    const avatarImage = getAvatarByName((item?.avatar_name ?? 'profile1') as AvatarName);
+    return (
+      <View
+        style={{
+          flexDirection: 'row',
+          padding: 20,
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          backgroundColor: '#A9DAD6',
+          height: 50,
+        }}>
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-around',
+          }}>
+          <Image source={avatarImage} style={styles.avatar} resizeMode="contain" />
+          <Text style={{ fontWeight: '600', fontSize: 20 }}> {item.name}</Text>
+        </View>
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}>
+          {expanded ? (
+            <Icon style={{ fontSize: 18 }} name="remove-circle" />
+          ) : (
+            <Icon style={{ fontSize: 18 }} name="add-circle" />
+          )}
+        </View>
+      </View>
+    );
+  }
+  _renderContent(item) {
+    return (
+      <Card style={styles.card}>
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}>
+          <Text
+            style={{
+              padding: 10,
+              fontStyle: 'italic',
+            }}>
+            Count
+          </Text>
+          <Text>12</Text>
+        </View>
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}>
+          <Text
+            style={{
+              padding: 10,
+              fontStyle: 'italic',
+            }}>
+            Last Contribution
+          </Text>
+          <Text>Today</Text>
+        </View>
+      </Card>
+    );
   }
 
   render() {
@@ -154,15 +235,13 @@ export class ContributionsScreen extends Component<RenderProps, State> {
               </Header>
 
               {this.state.isLoaded ? (
-                <View style={styles.profileList}>
-                  <Accordion dataArray={dataArray} expanded={0} />
-
-                  <TouchableOpacity style={styles.cardContainer} key="new" onPress={() => this.gotoCreateProfile()}>
-                    <Card style={styles.card}>
-                      <Image source={addProfile} style={styles.addImage} resizeMode="contain" />
-                      <RegularText>{i18n.t('select-profile-button')}</RegularText>
-                    </Card>
-                  </TouchableOpacity>
+                <View>
+                  <Accordion
+                    dataArray={dataArray}
+                    expanded={0}
+                    renderHeader={this._renderHeader}
+                    renderContent={this._renderContent}
+                  />
                 </View>
               ) : (
                 <Loading
@@ -179,29 +258,6 @@ export class ContributionsScreen extends Component<RenderProps, State> {
     );
   }
 }
-
-// {this.state.patients.map((patient, i) => {
-//     const avatarImage = getAvatarByName((patient.avatar_name ?? 'profile1') as AvatarName);
-//     const hasReportedToday = patient.last_reported_at && getDaysAgo(patient.last_reported_at) === 0;
-//     return (
-//       <View style={styles.cardContainer} key={key(patient)}>
-//         <TouchableOpacity onPress={() => this.profileSelected(patient.id, i)}>
-//           <Card style={styles.card}>
-//             <View style={styles.avatarContainer}>
-//               {hasReportedToday && (
-//                 <View style={styles.circle}>
-//                   <Image source={tick} style={styles.tick} />
-//                 </View>
-//               )}
-//               <Image source={avatarImage} style={styles.avatar} resizeMode="contain" />
-//             </View>
-//             <ClippedText>{patient.name}</ClippedText>
-//             <DaysAgo timeAgo={patient.last_reported_at} />
-//           </Card>
-//         </TouchableOpacity>
-//       </View>
-//     );
-//   })}
 
 const styles = StyleSheet.create({
   profileList: {
@@ -225,8 +281,9 @@ const styles = StyleSheet.create({
   },
 
   avatar: {
-    height: 100,
-    width: 100,
+    height: 30,
+    marginRight: 10,
+    width: 30,
   },
 
   tick: {
@@ -255,11 +312,11 @@ const styles = StyleSheet.create({
 
   card: {
     width: '100%',
-    borderRadius: 16,
-    minHeight: 200,
+    borderBottomLeftRadius: 16,
+    borderBottomRightRadius: 16,
+    marginTop: 0,
     paddingVertical: 20,
     paddingHorizontal: 12,
-    alignItems: 'center',
   },
 
   view: {

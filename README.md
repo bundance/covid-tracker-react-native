@@ -152,3 +152,13 @@ ZOE Engineering - engineering@joinzoe.com
 ## Acknowledgements
 
 - [Contributor Covenant](https://www.contributor-covenant.org)
+
+## My Contribution
+
+### Added
+
+### Assumptions
+
+### What I'd have done differently
+In somes case, a margin has been added to add space between two Views. Normally, I prefer to use a dedicated `<Spacer>` component to add space, but the codebase doesn't have one, so in the interests of time, I used the margin hack.
+
