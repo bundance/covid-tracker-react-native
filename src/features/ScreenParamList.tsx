@@ -29,6 +29,7 @@ export type ScreenParamList = {
   ResetPasswordConfirm: undefined;
   Register: undefined;
   Login: { terms: string };
+  Contributions: { patientId: string | null };
   CountrySelect: { patientId: string | null };
   ProfileBackDate: { currentPatient: PatientStateType };
 

@@ -1,4 +1,5 @@
 import Analytics from '@covid/core/Analytics';
+import { ContributionsScreen } from '@covid/features/ContributionsScreen';
 import { CountrySelectScreen } from '@covid/features/CountrySelectScreen';
 import { DrawerMenu } from '@covid/features/DrawerMenu';
 import { ScreenParamList } from '@covid/features/ScreenParamList';
@@ -159,6 +160,7 @@ export default class CovidApp extends Component<object, State> {
     return (
       <Stack.Navigator>
         <Stack.Screen name="Splash" component={SplashScreen} options={noHeader} />
+        <Stack.Screen name="Contributions" component={ContributionsScreen} options={noHeader} />
         <Stack.Screen name="CountrySelect" component={CountrySelectScreen} options={noHeader} />
         <Stack.Screen name="Welcome" component={Welcome1Screen} options={noHeader} />
         <Stack.Screen name="Welcome2" component={Welcome2Screen} options={noHeader} />
