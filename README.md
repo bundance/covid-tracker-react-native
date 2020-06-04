@@ -100,7 +100,7 @@ npm install expo-cli --g
    ```bash
    npm run mock-server
    ```
-   
+
 ### Git Hooks
 
 The git hook checks can be manually disabled calling git commit and git push with the --no-verify flag if needed.
@@ -160,5 +160,5 @@ ZOE Engineering - engineering@joinzoe.com
 ### Assumptions
 
 ### What I'd have done differently
-In somes case, a margin has been added to add space between two Views. Normally, I prefer to use a dedicated `<Spacer>` component to add space, but the codebase doesn't have one, so in the interests of time, I used the margin hack.
 
+- In somes case, a margin has been added to add space between two Views. Normally, I prefer to use a dedicated `<Spacer>` component to add space, but the codebase doesn't have one, so in the interests of time, I used the margin hack.

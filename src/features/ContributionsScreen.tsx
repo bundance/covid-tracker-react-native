@@ -173,6 +173,9 @@ export class ContributionsScreen extends Component<RenderProps, State> {
     );
   }
   _renderContent(item) {
+    const lastReported = item.last_reported_at
+      ? getDaysAgo(item.last_reported_at)
+      : i18n.t('contributions.not-reported');
     return (
       <Card style={styles.card}>
         <View
@@ -186,7 +189,7 @@ export class ContributionsScreen extends Component<RenderProps, State> {
               padding: 10,
               fontStyle: 'italic',
             }}>
-            Count
+            {i18n.t('contributions.count')}
           </Text>
           <Text>12</Text>
         </View>
@@ -201,9 +204,9 @@ export class ContributionsScreen extends Component<RenderProps, State> {
               padding: 10,
               fontStyle: 'italic',
             }}>
-            Last Contribution
+            {i18n.t('contributions.last-contribution')}
           </Text>
-          <Text>Today</Text>
+          <Text>{lastReported}</Text>
         </View>
       </Card>
     );
