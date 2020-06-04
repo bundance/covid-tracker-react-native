@@ -1,6 +1,7 @@
 import { PatientStateType } from '@covid/core/patient/PatientState';
 import { CovidTest } from '@covid/core/user/dto/CovidTestContracts';
 import { UserResponse } from '@covid/core/user/dto/UserAPIContracts';
+import AssessmentCoordinator, { AssessmentData } from '@covid/features/assessment/AssessmentCoordinator';
 
 export enum ConsentType {
   Adult = 'adult',
@@ -31,7 +32,6 @@ export type ScreenParamList = {
   Login: { terms: string };
   Contributions: { patientId: string | null };
   CountrySelect: { patientId: string | null };
-  ProfileBackDate: { currentPatient: PatientStateType };
 
   // PII screens
   OptionalInfo: { patientId: string };
@@ -52,15 +52,16 @@ export type ScreenParamList = {
   PreviousExposure: { currentPatient: PatientStateType };
 
   // Assessment screens
-  HealthWorkerExposure: { currentPatient: PatientStateType; assessmentId: string | null };
-  CovidTest: { currentPatient: PatientStateType; assessmentId: string | null; tests?: CovidTest[] };
-  CovidTestDetail: { currentPatient: PatientStateType; test?: CovidTest };
-  HowYouFeel: { currentPatient: PatientStateType; assessmentId: string };
-  DescribeSymptoms: { currentPatient: PatientStateType; assessmentId: string };
-  WhereAreYou: { currentPatient: PatientStateType; assessmentId: string };
-  LevelOfIsolation: { currentPatient: PatientStateType; assessmentId: string | null };
-  TreatmentSelection: { currentPatient: PatientStateType; assessmentId: string; location?: string };
-  TreatmentOther: { currentPatient: PatientStateType; assessmentId: string; location?: string };
+  HealthWorkerExposure: { assessmentData: AssessmentData };
+  CovidTest: { assessmentData: AssessmentData; tests?: CovidTest[] };
+  CovidTestDetail: { assessmentData: AssessmentData; test?: CovidTest };
+  HowYouFeel: { assessmentData: AssessmentData };
+  DescribeSymptoms: { assessmentData: AssessmentData };
+  WhereAreYou: { assessmentData: AssessmentData };
+  LevelOfIsolation: { assessmentData: AssessmentData };
+  TreatmentSelection: { assessmentData: AssessmentData; location: string };
+  TreatmentOther: { assessmentData: AssessmentData; location: string };
+  ProfileBackDate: { assessmentData: AssessmentData };
 
   // Completion screens
   ThankYou: undefined;

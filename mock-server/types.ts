@@ -22,3 +22,11 @@ export interface Contributions {
   report_count: number;
   contribution_for_others_count: number;
 }
+
+export interface Consent {
+  id: string;
+}
+
+export interface StudyConsent {
+  id: string;
+}

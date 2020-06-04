@@ -11,13 +11,13 @@ import { UserNotFoundException } from '../Exception';
 import { ApiClientBase } from '../api/ApiClientBase';
 import { handleServiceError } from '../api/ApiServiceErrors';
 import { camelizeKeys } from '../api/utils';
+import { AssessmentInfosRequest } from '../assessment/dto/AssessmentInfosRequest';
+import { AssessmentResponse } from '../assessment/dto/AssessmentInfosResponse';
 import { getInitialPatientState, PatientStateType, PatientProfile } from '../patient/PatientState';
 import { cleanIntegerVal } from '../utils/number';
 import {
   AreaStatsResponse,
   AskValidationStudy,
-  AssessmentInfosRequest,
-  AssessmentResponse,
   Consent,
   LoginOrRegisterResponse,
   PatientInfosRequest,
@@ -188,6 +188,7 @@ export default class UserService extends ApiClientBase
       password1: password,
       password2: password,
       country_code: UserService.userCountry,
+      language_code: UserService.getLocale(),
       consent_document: UserService.consentSigned.document,
       consent_version: UserService.consentSigned.version,
       privacy_policy_version: UserService.consentSigned.privacy_policy_version,
@@ -541,6 +542,10 @@ export default class UserService extends ApiClientBase
     };
 
     i18n.locale = localeMap[countryCode] + '-' + UserService.userCountry;
+  }
+
+  private static getLocale() {
+    return Localization.locale.split('-')[0];
   }
 
   async shouldAskForValidationStudy() {

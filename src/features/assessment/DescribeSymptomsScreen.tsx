@@ -1,3 +1,4 @@
+import { assessmentService } from '@covid/Services';
 import DropdownField from '@covid/components/DropdownField';
 import { GenericTextField } from '@covid/components/GenericTextField';
 import ProgressStatus from '@covid/components/ProgressStatus';
@@ -5,9 +6,10 @@ import Screen, { FieldWrapper, Header, ProgressBlock } from '@covid/components/S
 import { BrandedButton, ErrorText, HeaderText } from '@covid/components/Text';
 import { ValidatedTextInput } from '@covid/components/ValidatedTextInput';
 import { ValidationErrors } from '@covid/components/ValidationError';
+import { AssessmentInfosRequest } from '@covid/core/assessment/dto/AssessmentInfosRequest';
 import UserService from '@covid/core/user/UserService';
-import { AssessmentInfosRequest } from '@covid/core/user/dto/UserAPIContracts';
 import { cleanFloatVal } from '@covid/core/utils/number';
+import AssessmentCoordinator from '@covid/features/assessment/AssessmentCoordinator';
 import i18n from '@covid/locale/i18n';
 import { RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -131,25 +133,20 @@ export default class DescribeSymptomsScreen extends Component<SymptomProps, Stat
     otherSymptoms: Yup.string(),
   });
 
-  handleUpdateSymptoms(formData: DescribeSymptomsData) {
+  async handleUpdateSymptoms(formData: DescribeSymptomsData) {
     if (this.state.enableSubmit) {
       this.setState({ enableSubmit: false }); // Stop resubmissions
 
-      const { currentPatient, assessmentId } = this.props.route.params;
-      const userService = new UserService();
-      var infos = this.createAssessmentInfos(formData);
+      try {
+        const { assessmentId } = AssessmentCoordinator.assessmentData;
+        var infos = this.createAssessmentInfos(formData);
+        await assessmentService.saveAssessment(assessmentId!, infos);
+        AssessmentCoordinator.gotoNextScreen(this.props.route.name);
+      } catch (error) {
+        this.setState({ errorMessage: i18n.t('something-went-wrong') });
+      }
 
-      userService
-        .updateAssessment(assessmentId, infos)
-        .then(() => {
-          this.props.navigation.navigate('WhereAreYou', { currentPatient, assessmentId });
-        })
-        .catch(() => {
-          this.setState({ errorMessage: i18n.t('something-went-wrong') });
-        })
-        .then(() => {
-          this.setState({ enableSubmit: true });
-        });
+      this.setState({ enableSubmit: true });
     }
   }
 
@@ -211,7 +208,7 @@ export default class DescribeSymptomsScreen extends Component<SymptomProps, Stat
   }
 
   render() {
-    const currentPatient = this.props.route.params.currentPatient;
+    const currentPatient = AssessmentCoordinator.assessmentData.currentPatient;
     const temperatureItems = [
       { label: i18n.t('describe-symptoms.picker-celsius'), value: 'C' },
       { label: i18n.t('describe-symptoms.picker-fahrenheit'), value: 'F' },
