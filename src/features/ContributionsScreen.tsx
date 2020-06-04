@@ -55,6 +55,8 @@ const dataArray = [
     id: '00000000-0000-0000-0000-000000000000',
     avatar_name: 'profile1',
     name: 'Me',
+    last_reported_at: Date.now(),
+    report_count: 12,
   },
   {
     id: '00000000-0000-0000-0000-000000000001',
@@ -174,8 +176,9 @@ export class ContributionsScreen extends Component<RenderProps, State> {
   }
   _renderContent(item) {
     const lastReported = item.last_reported_at
-      ? getDaysAgo(item.last_reported_at)
+      ? getDaysAgo(item.last_reported_at) || 'Today'
       : i18n.t('contributions.not-reported');
+
     return (
       <Card style={styles.card}>
         <View
@@ -191,7 +194,7 @@ export class ContributionsScreen extends Component<RenderProps, State> {
             }}>
             {i18n.t('contributions.count')}
           </Text>
-          <Text>12</Text>
+          <Text>{item.report_count || 0}</Text>
         </View>
         <View
           style={{
@@ -213,6 +216,7 @@ export class ContributionsScreen extends Component<RenderProps, State> {
   }
 
   render() {
+    console.log(this.state.patients);
     return (
       <View style={styles.view}>
         <SafeAreaView>
