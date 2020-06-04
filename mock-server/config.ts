@@ -11,6 +11,16 @@ const config: DbConfig = {
       },
     },
   },
+  contributions: {
+    path: 'contributions.json',
+    defaultData: {
+      '00000000-0000-0000-0000-000000000000': {
+        id: '00000000-0000-0000-0000-000000000000',
+        report_count: 0,
+        contribution_for_others_count: 0,
+      },
+    },
+  },
   assessments: {
     path: 'assassments.json',
   },

@@ -24,6 +24,7 @@ import {
   PiiRequest,
   StartupInfo,
   UserResponse,
+  ContributionsResponse,
 } from './dto/UserAPIContracts';
 
 const ASSESSMENT_VERSION = '1.4.0'; // TODO: Wire this to something automatic.
@@ -87,6 +88,9 @@ export interface IDontKnowService {
   getAreaStats(patientId: string): Promise<any>;
 }
 
+export interface IContributionsService {
+  getContributions(): Promise<ContributionsResponse | null>;
+}
 export default class UserService extends ApiClientBase
   implements
     IUserService, // TODO: ideally a UserService should only implement this, everything else is a separate service
@@ -95,7 +99,8 @@ export default class UserService extends ApiClientBase
     IPatientService,
     IAssessmentService,
     ILocalisationService,
-    IDontKnowService {
+    IDontKnowService,
+    IContributionsService {
   public static userCountry = 'US';
   public static ipCountry = '';
   public static countryConfig: ConfigType;
@@ -209,6 +214,16 @@ export default class UserService extends ApiClientBase
     try {
       const response = await this.client.get(`/patient_list/`);
       return response;
+    } catch (error) {
+      handleServiceError(error);
+    }
+    return null;
+  }
+
+  public async getContributions(): Promise<ContributionsResponse | null> {
+    try {
+      const contributionsResponse = await this.client.get<ContributionsResponse>(`/contributions/`);
+      return contributionsResponse.data;
     } catch (error) {
       handleServiceError(error);
     }

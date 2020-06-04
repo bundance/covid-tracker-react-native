@@ -16,3 +16,9 @@ export interface CovidTest {
   id: string;
   patient: string;
 }
+
+export interface Contributions {
+  id: string;
+  report_count: number;
+  contribution_for_others_count: number;
+}

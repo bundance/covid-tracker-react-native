@@ -8,6 +8,7 @@ import { ApiErrorState, initialErrorState } from '@covid/core/api/ApiServiceErro
 import i18n from '@covid/locale/i18n';
 import { AvatarName, getAvatarByName } from '@covid/utils/avatar';
 import { getDaysAgo } from '@covid/utils/datetime';
+import merge from '@covid/utils/merge';
 import { DrawerNavigationProp } from '@react-navigation/drawer';
 import { RouteProp } from '@react-navigation/native';
 import { colors } from '@theme';
@@ -30,6 +31,7 @@ type Patient = {
   avatar_name?: string;
   reported_by_another?: boolean;
   report_count?: number;
+  contribution_for_others_count: number;
   last_reported_at?: Date;
   created_at?: Date;
 };
@@ -49,26 +51,6 @@ const initialState = {
   shouldRefresh: false,
 };
 
-// blobby
-const dataArray = [
-  {
-    id: '00000000-0000-0000-0000-000000000000',
-    avatar_name: 'profile1',
-    name: 'Me',
-    last_reported_at: Date.now(),
-    report_count: 12,
-  },
-  {
-    id: '00000000-0000-0000-0000-000000000001',
-    avatar_name: 'profile2',
-    name: 'Joe',
-  },
-  {
-    id: '00000000-0000-0000-0000-000000000002',
-    avatar_name: 'profile3',
-    name: 'Anna',
-  },
-];
 export class ContributionsScreen extends Component<RenderProps, State> {
   constructor(props: RenderProps) {
     super(props);
@@ -94,12 +76,17 @@ export class ContributionsScreen extends Component<RenderProps, State> {
   async listProfiles() {
     this.setState({ status: i18n.t('errors.status-loading'), error: null });
     try {
-      const response = await userService.listPatients();
-      response &&
+      const patientsResponse = await userService.listPatients();
+      const contributionsResponse = await userService.getContributions();
+
+      if (patientsResponse && contributionsResponse) {
+        const mergedResponses = merge(patientsResponse.data, contributionsResponse);
+
         this.setState({
-          patients: response.data && Object.values(response.data),
+          patients: patientsResponse.data && Object.values(mergedResponses),
           isLoaded: true,
         });
+      }
     } catch (error) {
       this.setState({ error });
     }
@@ -109,7 +96,7 @@ export class ContributionsScreen extends Component<RenderProps, State> {
     try {
       const currentPatient = await userService.getCurrentPatient(patientId);
       this.setState({ isApiError: false });
-      await Navigator.profileSelected(index == 0, currentPatient);
+      await Navigator.profileSelected(index === 0, currentPatient);
     } catch (error) {
       this.setState({
         isApiError: true,
@@ -176,13 +163,15 @@ export class ContributionsScreen extends Component<RenderProps, State> {
 
   _renderContent(item: Patient) {
     const lastReported = item.last_reported_at
-      ? getDaysAgo(item.last_reported_at) || 'Today' // blobby
+      ? getDaysAgo(item.last_reported_at) || i18n.t('today')
       : i18n.t('contributions.not-reported');
 
     let daysAgoText = '';
     if (typeof lastReported === 'number') {
       daysAgoText = lastReported === 1 ? i18n.t('contributions.day-ago') : i18n.t('contributions.days-ago');
     }
+
+    const reportCount = (item?.report_count ?? 0) + (item?.contribution_for_others_count ?? 0);
 
     return (
       <Card style={styles.card}>
@@ -199,7 +188,7 @@ export class ContributionsScreen extends Component<RenderProps, State> {
             }}>
             {i18n.t('contributions.count')}
           </Text>
-          <Text>{item.report_count ?? 0}</Text>
+          <Text>{reportCount}</Text>
         </View>
         <View
           style={{

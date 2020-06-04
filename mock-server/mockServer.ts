@@ -133,6 +133,13 @@ app.get('/patient_list/', (_, res) => {
 });
 
 /**
+ * contributions endpoints
+ */
+app.get('/contributions/', (_, res) => {
+  return res.status(200).send(db.contributions.get());
+});
+
+/**
  * assessments endpoints
  */
 

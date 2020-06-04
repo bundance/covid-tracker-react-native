@@ -283,3 +283,8 @@ export type StartupInfo = {
 export type AskValidationStudy = {
   should_ask_uk_validation_study: boolean;
 };
+
+export type ContributionsResponse = {
+  report_count: number;
+  contribution_for_others_count: number;
+};
