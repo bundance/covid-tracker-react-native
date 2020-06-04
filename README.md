@@ -2,6 +2,8 @@
 
 ## Table of Contents
 
+- [My Contributions for this task](#my-contributions-for-this-task)
+
 - [About The Project](#about-the-project)
   - [Built With](#built-with)
 - [Getting Started](#getting-started)
@@ -14,6 +16,47 @@
 - [License](#license)
 - [Contact](#contact)
 - [Acknowledgements](#acknowledgements)
+
+## My Contributions for this task
+
+### Added
+
+- Created a new ContributionsScreen that's linked to from the DrawerMenu
+- The ContributionsScreen lists patients in an animated accordion, which shows the number of contributions each patient has made, an the last day they made a contribution.
+- The contribution number is a combination of the number of contributions they've made for themselves, plus the number of combinations they've made on behalf of other people. It also shows the last day of a contribution that they made.
+- Added a /contributions/ endpoint that returns the user's contributions count for both themselves and the contributions they've made on behalf of others. This data is mocked in `contributions.json`, and looks like this:
+
+```
+{
+   "00000000-0000-0000-0000-000000000002": {
+    "id": "00000000-0000-0000-0000-000000000002",
+    "report_count": 3,
+    "contribution_for_others_count": 0
+  }
+}
+```
+
+- Added a back button in the form of a link that takes the user back to the previous screen
+
+### Assumptions
+
+The existing patients data returned from the `/patients/` endpoint does not include the number of contributions made by a patient on behalf of someone else.
+
+As the task requires calculating the _total_ number of contributions made(i.e. contributions made by the patient for themselves, and on behalf of someone else), I had to decide on the best place to store this data. I chose to add a new endpoint called `/contributions/` that returns:
+
+- the number of contributions for the patient (`report_count`)
+- the number of contributions made by the patient on behalf of someone else (`contribution_for_others_count`)
+
+In reality, this endpoint is not needed, as the field `contribution_for_others_count` could more easily be added to the data returned from the `/patients/` data. However, the task required creating a new endpoint, so I chose to add the `/contributions/` endpoint as a separate endpoint to fulfill this part of the challenge.
+
+### Things I didn't have time to do
+
+- In somes case, a margin has been added in CSS to add space between two Views. Normally, I prefer to use a dedicated `<Spacer>` component to add space, but the codebase doesn't have one, so in the interests of time, I simply adjusted the margin.
+- I wrote a daysAgo function without realising there's a `DaysAgo` component. However, this component calculates the days ago value, and wraps some JSX around it. It would be better for this logic from the `DaysAgo` component to be refactored out of the component and into a helper function (in which case, the `DaysAgo` component would be no longer needed).
+- I didn't have time to highlight the profiles that don't have symptoms reported for more than a day
+- I didn't have time to write any unit tests, but you can see exampes of unit tests I've written on other repos in [my Github account](https://github.com/bundance).
+
+---
 
 ## About The Project
 
@@ -152,14 +195,3 @@ ZOE Engineering - engineering@joinzoe.com
 ## Acknowledgements
 
 - [Contributor Covenant](https://www.contributor-covenant.org)
-
-## My Contribution
-
-### Added
-
-### Assumptions
-
-### Things I didn't have time to do
-
-- In somes case, a margin has been added to add space between two Views. Normally, I prefer to use a dedicated `<Spacer>` component to add space, but the codebase doesn't have one, so in the interests of time, I used the margin hack.
-- Refactor DaysAgo so it's just a function that returns a string

@@ -1,9 +1,8 @@
-import { addProfile, menuIcon, NUMBER_OF_PROFILE_AVATARS, tick } from '@assets';
+import { menuIcon } from '@assets';
 import { offlineService, userService } from '@covid/Services';
-import DaysAgo from '@covid/components/DaysAgo';
 import { Loading, LoadingModal } from '@covid/components/Loading';
 import { Header } from '@covid/components/Screen';
-import { ClippedText, HeaderText, RegularText } from '@covid/components/Text';
+import { HeaderText } from '@covid/components/Text';
 import { ApiErrorState, initialErrorState } from '@covid/core/api/ApiServiceErrors';
 import i18n from '@covid/locale/i18n';
 import { AvatarName, getAvatarByName } from '@covid/utils/avatar';
@@ -14,10 +13,8 @@ import { RouteProp } from '@react-navigation/native';
 import { colors } from '@theme';
 import { Accordion, Card, Icon, Text } from 'native-base';
 import React, { Component } from 'react';
-import { Image, SafeAreaView, ScrollView, StyleSheet, TouchableOpacity, View, Button } from 'react-native';
-import key from 'weak-key';
+import { Image, SafeAreaView, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 
-import Navigator from './Navigation';
 import { ScreenParamList } from './ScreenParamList';
 
 type RenderProps = {
@@ -60,20 +57,20 @@ export class ContributionsScreen extends Component<RenderProps, State> {
   async componentDidMount() {
     this.props.navigation.addListener('focus', async () => {
       if (this.state.shouldRefresh) {
-        await this.listProfiles();
+        await this.listContributions();
       }
     });
 
-    await this.listProfiles();
+    await this.listContributions();
     this.setState({ shouldRefresh: true });
   }
 
-  private retryListProfiles() {
+  private retryListContributions() {
     this.setState({ status: i18n.t('errors.status-retrying'), error: null });
-    setTimeout(() => this.listProfiles(), offlineService.getRetryDelay());
+    setTimeout(() => this.listContributions(), offlineService.getRetryDelay());
   }
 
-  async listProfiles() {
+  async listContributions() {
     this.setState({ status: i18n.t('errors.status-loading'), error: null });
     try {
       const patientsResponse = await userService.listPatients();
@@ -92,39 +89,7 @@ export class ContributionsScreen extends Component<RenderProps, State> {
     }
   }
 
-  async profileSelected(patientId: string, index: number) {
-    try {
-      const currentPatient = await userService.getCurrentPatient(patientId);
-      this.setState({ isApiError: false });
-      await Navigator.profileSelected(index === 0, currentPatient);
-    } catch (error) {
-      this.setState({
-        isApiError: true,
-        error,
-        onRetry: () => {
-          this.setState({
-            status: i18n.t('errors.status-retrying'),
-            error: null,
-          });
-          setTimeout(() => {
-            this.setState({ status: i18n.t('errors.status-loading') });
-            this.profileSelected(patientId, index);
-          }, offlineService.getRetryDelay());
-        },
-      });
-    }
-  }
-
-  getNextAvatarName() {
-    if (this.state.patients) {
-      const n = (this.state.patients.length + 1) % NUMBER_OF_PROFILE_AVATARS;
-      return 'profile' + n.toString();
-    } else {
-      return 'profile1';
-    }
-  }
-
-  _renderHeader(item: Patient, expanded: boolean) {
+  renderHeader(item: Patient, expanded: boolean) {
     const avatarImage = getAvatarByName((item?.avatar_name ?? 'profile1') as AvatarName);
     return (
       <View
@@ -161,7 +126,7 @@ export class ContributionsScreen extends Component<RenderProps, State> {
     );
   }
 
-  _renderContent(item: Patient) {
+  renderContent(item: Patient) {
     const lastReported = item.last_reported_at
       ? getDaysAgo(item.last_reported_at) || i18n.t('today')
       : i18n.t('contributions.not-reported');
@@ -254,8 +219,8 @@ export class ContributionsScreen extends Component<RenderProps, State> {
                   <Accordion
                     dataArray={this.state.patients}
                     expanded={0}
-                    renderHeader={this._renderHeader}
-                    renderContent={this._renderContent}
+                    renderHeader={this.renderHeader}
+                    renderContent={this.renderContent}
                   />
                 </View>
               ) : (
@@ -263,7 +228,7 @@ export class ContributionsScreen extends Component<RenderProps, State> {
                   status={this.state.status}
                   error={this.state.error}
                   style={{ borderColor: 'green', borderWidth: 1 }}
-                  onRetry={() => this.retryListProfiles()}
+                  onRetry={() => this.retryListContributions()}
                 />
               )}
             </View>
@@ -275,54 +240,10 @@ export class ContributionsScreen extends Component<RenderProps, State> {
 }
 
 const styles = StyleSheet.create({
-  profileList: {
-    flex: 1,
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    alignItems: 'flex-start',
-    width: '100%',
-    alignContent: 'stretch',
-  },
-
-  cardContainer: {
-    width: '45%',
-    margin: 5,
-  },
-
-  avatarContainer: {
-    alignItems: 'center',
-    width: 100,
-    marginBottom: 10,
-  },
-
   avatar: {
     height: 30,
     marginRight: 10,
     width: 30,
-  },
-
-  tick: {
-    height: 30,
-    width: 30,
-  },
-
-  circle: {
-    position: 'absolute',
-    alignItems: 'center',
-    justifyContent: 'center',
-    zIndex: 1,
-    top: 0,
-    right: -5,
-    width: 34,
-    height: 34,
-    borderRadius: 17,
-    backgroundColor: 'white',
-  },
-
-  addImage: {
-    width: '100%',
-    height: 100,
-    marginBottom: 10,
   },
 
   card: {
@@ -338,28 +259,14 @@ const styles = StyleSheet.create({
     backgroundColor: colors.backgroundSecondary,
   },
 
-  scrollView: {
-    flexGrow: 1,
-    backgroundColor: colors.backgroundSecondary,
-    justifyContent: 'space-between',
-  },
-
-  content: {
-    justifyContent: 'space-between',
-    marginVertical: 32,
-    marginHorizontal: 18,
-  },
-
   rootContainer: {
     padding: 10,
   },
 
-  shareContainer: {
-    backgroundColor: colors.white,
-    borderRadius: 10,
-    marginHorizontal: 20,
-    paddingHorizontal: 20,
-    paddingVertical: 15,
+  scrollView: {
+    flexGrow: 1,
+    backgroundColor: colors.backgroundSecondary,
+    justifyContent: 'space-between',
   },
 
   menuIcon: {
