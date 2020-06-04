@@ -69,7 +69,6 @@ const dataArray = [
     name: 'Anna',
   },
 ];
-
 export class ContributionsScreen extends Component<RenderProps, State> {
   constructor(props: RenderProps) {
     super(props);
@@ -98,7 +97,7 @@ export class ContributionsScreen extends Component<RenderProps, State> {
       const response = await userService.listPatients();
       response &&
         this.setState({
-          patients: response.data,
+          patients: response.data && Object.values(response.data),
           isLoaded: true,
         });
     } catch (error) {
@@ -138,7 +137,7 @@ export class ContributionsScreen extends Component<RenderProps, State> {
     }
   }
 
-  _renderHeader(item, expanded) {
+  _renderHeader(item: Patient, expanded: boolean) {
     const avatarImage = getAvatarByName((item?.avatar_name ?? 'profile1') as AvatarName);
     return (
       <View
@@ -174,10 +173,16 @@ export class ContributionsScreen extends Component<RenderProps, State> {
       </View>
     );
   }
-  _renderContent(item) {
+
+  _renderContent(item: Patient) {
     const lastReported = item.last_reported_at
-      ? getDaysAgo(item.last_reported_at) || 'Today'
+      ? getDaysAgo(item.last_reported_at) || 'Today' // blobby
       : i18n.t('contributions.not-reported');
+
+    let daysAgoText = '';
+    if (typeof lastReported === 'number') {
+      daysAgoText = lastReported === 1 ? i18n.t('contributions.day-ago') : i18n.t('contributions.days-ago');
+    }
 
     return (
       <Card style={styles.card}>
@@ -194,7 +199,7 @@ export class ContributionsScreen extends Component<RenderProps, State> {
             }}>
             {i18n.t('contributions.count')}
           </Text>
-          <Text>{item.report_count || 0}</Text>
+          <Text>{item.report_count ?? 0}</Text>
         </View>
         <View
           style={{
@@ -209,14 +214,15 @@ export class ContributionsScreen extends Component<RenderProps, State> {
             }}>
             {i18n.t('contributions.last-contribution')}
           </Text>
-          <Text>{lastReported}</Text>
+          <Text>
+            {lastReported} {daysAgoText}
+          </Text>
         </View>
       </Card>
     );
   }
 
   render() {
-    console.log(this.state.patients);
     return (
       <View style={styles.view}>
         <SafeAreaView>
@@ -257,7 +263,7 @@ export class ContributionsScreen extends Component<RenderProps, State> {
               {this.state.isLoaded ? (
                 <View>
                   <Accordion
-                    dataArray={dataArray}
+                    dataArray={this.state.patients}
                     expanded={0}
                     renderHeader={this._renderHeader}
                     renderContent={this._renderContent}

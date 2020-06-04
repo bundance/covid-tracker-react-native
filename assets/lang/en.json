@@ -517,7 +517,9 @@
   "contributions": {
     "not-reported": "Not Reported Yet",
     "count": "Count",
-    "last-contribution": "Last Contribution"
+    "last-contribution": "Last Contribution",
+    "days-ago": "days ago",
+    "day-ago": "day ago"
   },
 
   "thank-you-title": "Thank you for your help and vital contribution to the study of COVID-19.",
