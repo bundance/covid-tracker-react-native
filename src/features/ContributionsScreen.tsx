@@ -13,7 +13,7 @@ import { RouteProp } from '@react-navigation/native';
 import { colors } from '@theme';
 import { Accordion, Card, Icon, Text } from 'native-base';
 import React, { Component } from 'react';
-import { Image, SafeAreaView, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Image, SafeAreaView, ScrollView, StyleSheet, TouchableOpacity, View, Button } from 'react-native';
 import key from 'weak-key';
 
 import Navigator from './Navigation';
@@ -231,7 +231,20 @@ export class ContributionsScreen extends Component<RenderProps, State> {
               </TouchableOpacity>
 
               <Header>
-                <HeaderText style={{ marginBottom: 12 }}>{i18n.t('my-contributions')}</HeaderText>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'flex-start',
+                  }}>
+                  <Icon
+                    name="chevron-thin-left"
+                    type="Entypo"
+                    style={styles.icon}
+                    onPress={() => this.props.navigation.goBack()}
+                  />
+                  <HeaderText style={{ marginBottom: 12 }}>{i18n.t('my-contributions')}</HeaderText>
+                </View>
               </Header>
 
               {this.state.isLoaded ? (
@@ -354,5 +367,12 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-end',
     marginRight: 15,
     marginTop: 10,
+  },
+
+  icon: {
+    fontSize: 16,
+    color: colors.secondary,
+    marginTop: -10,
+    marginRight: 10,
   },
 });
